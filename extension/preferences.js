@@ -192,6 +192,7 @@ webpg.preferences = {
                 Provides method to get the preference item
         */
         get: function(callback) {
+            "use strict";
             try {
                 webpg.plugin.gpgGetPreference('encrypt-to', function(encrypt_to) {
                   encrypt_to = encrypt_to.value;

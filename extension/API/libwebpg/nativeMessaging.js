@@ -38,7 +38,7 @@ webpg.nativeMessaging = {
         port.process.killed = true;
       });
     } else {
-      let env_vars = {
+      var env_vars = {
         'GNUPGHOME': webpg.utils.env.GNUPGHOME,
         'GPG_AGENT_INFO': webpg.utils.env.GPG_AGENT_INFO,
         'HOME': webpg.utils.env.HOME,
@@ -51,7 +51,7 @@ webpg.nativeMessaging = {
       };
       // delete any keys with undefined values
       for (k in env_vars) { if (env_vars[k] === undefined) delete env_vars[k]; }
-      let options = {
+      var options = {
         encoding: null,
         env: env_vars
       };
@@ -76,8 +76,8 @@ webpg.nativeMessaging = {
       };
       this.bytes = 0;
       this.intToBytes = function(int) {
-          let byteString='';
-          for (let i=0;i<=3;i++) {
+          var byteString='';
+          for (var i=0;i<=3;i++) {
             byteString+=String.fromCharCode((int>>(8*i))&255);
           }
           return byteString;
@@ -120,7 +120,7 @@ webpg.nativeMessaging = {
 
         if (this.bytes < 1) {
           webpg.utils.debug("message is complete, sending message.");
-          let msg = this.buffer;
+          var msg = this.buffer;
           this.buffer = "";
           this.bytes = 0;
 
@@ -138,7 +138,7 @@ webpg.nativeMessaging = {
         //webpg.utils.debug("adding listener");
 
         process.stdout.on('data', function (data) {
-          let data_array = Uint8Array.from(data, (c) => c.charCodeAt(0));
+          var data_array = Uint8Array.from(data, function(c) {c.charCodeAt(0);});
           port.parse(data_array, callback);
         });
 
@@ -157,9 +157,9 @@ webpg.nativeMessaging = {
       };
 
       this.postMessage = function(msg) {
-        let msg_string = JSON.stringify(msg)
-        let msg_array = Uint8Array.from(msg_string, (c) => c.charCodeAt(0));
-        let msg_length = this.intToBytes(msg_array.byteLength);
+        var msg_string = JSON.stringify(msg)
+        var msg_array = Uint8Array.from(msg_string, function(c) {c.charCodeAt(0);});
+        var msg_length = this.intToBytes(msg_array.byteLength);
 
         webpg.utils.debug("posting data to pid:", process.pid, 'for function:', msg_string);
 
@@ -171,13 +171,13 @@ webpg.nativeMessaging = {
     port.callbacks = {};
 
     port.callbackRouter = function(result) {
-      let func = result.func || result.type || undefined;
+      var func = result.func || result.type || undefined;
       if (func === "onkeygencomplete")
         func = "onkeygenprogress";
-      let _id = result._id || func;
+      var _id = result._id || func;
 
       if (func !== undefined) {
-        let cb = port.callbacks[func][_id] || port.callbacks[func] || undefined;
+        var cb = port.callbacks[func][_id] || port.callbacks[func] || undefined;
 
         delete result.func;
         delete result._id;
@@ -844,25 +844,27 @@ webpg.plugin = {
     }
     return webpg.nativeMessaging.nativeFunction(args, callback);
   },
+  gpgSignUID: function() {
 
-  gpgSignUID: function(...args) {
-    var callback = args.pop(-1);
+    var in_args = Array.from(arguments);
+    var callback = in_args.pop(-1);
     var args = {
       "func": "gpgSignUID",
-      "params": args
+      "params": in_args
     }
     return webpg.nativeMessaging.nativeFunction(args, callback);
   },
 
-  gpgDeleteUIDSign: function(...args) {
-    var callback = args.pop(-1);
+  gpgDeleteUIDSign: function() {
+
+    var in_args = Array.from(arguments);
+    var callback = in_args.pop(-1);
     var args = {
       "func": "gpgDeleteUIDSign",
-      "params": args
+      "params": in_args
     }
     return webpg.nativeMessaging.nativeFunction(args, callback);
   },
-
 
   sendMessage: function(params, callback) {
     var args = {
